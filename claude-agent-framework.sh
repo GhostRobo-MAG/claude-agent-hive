@@ -6,6 +6,11 @@
 
 set -e
 
+# Function to capitalize first letter (portable across bash versions)
+capitalize() {
+    echo "$(echo "${1:0:1}" | tr '[:lower:]' '[:upper:]')${1:1}"
+}
+
 PROJECT_NAME=""
 AGENTS=()
 FRAMEWORK_DIR=""
@@ -128,9 +133,9 @@ generate_agent_files() {
         agent_file="$FRAMEWORK_DIR/commands/agents/${agent_name}.md"
         
         cat > "$agent_file" << EOF
-# ${agent_name^} Agent - $PROJECT_NAME $agent_role
+# $(capitalize "$agent_name") Agent - $PROJECT_NAME $agent_role
 
-You are the **${agent_name^} Agent** serving as the $agent_role for the $PROJECT_NAME project.
+You are the **$(capitalize "$agent_name") Agent** serving as the $agent_role for the $PROJECT_NAME project.
 
 ## Your Role & Responsibilities
 
@@ -224,7 +229,7 @@ EOF
     for agent in "${AGENTS[@]}"; do
         IFS=':' read -r agent_name agent_role <<< "$agent"
         cat >> "$FRAMEWORK_DIR/commands/workflow-start.md" << EOF
-- **${agent_name^} Agent**: $agent_role activation
+- **$(capitalize "$agent_name") Agent**: $agent_role activation
 EOF
     done
 
@@ -298,7 +303,7 @@ EOF
             IFS=':' read -r agent1_name agent1_role <<< "${AGENTS[i]}"
             IFS=':' read -r agent2_name agent2_role <<< "${AGENTS[j]}"
             cat >> "$FRAMEWORK_DIR/commands/coordinate.md" << EOF
-- **${agent1_name^} Agent** ↔ **${agent2_name^} Agent** coordination
+- **$(capitalize "$agent1_name") Agent** ↔ **$(capitalize "$agent2_name") Agent** coordination
 EOF
         done
     done
@@ -371,7 +376,7 @@ EOF
     for agent in "${AGENTS[@]}"; do
         IFS=':' read -r agent_name agent_role <<< "$agent"
         cat >> "$FRAMEWORK_DIR/commands/status-check.md" << EOF
-- **${agent_name^} Agent** ($agent_role): Current tasks and progress
+- **$(capitalize "$agent_name") Agent** ($agent_role): Current tasks and progress
 EOF
     done
 
@@ -454,7 +459,7 @@ EOF
     for agent in "${AGENTS[@]}"; do
         IFS=':' read -r agent_name agent_role <<< "$agent"
         cat >> "$FRAMEWORK_DIR/shared/tasks.md" << EOF
-- **${agent_name^}**: $agent_role tasks
+- **$(capitalize "$agent_name")**: $agent_role tasks
 EOF
     done
 
@@ -522,7 +527,7 @@ EOF
         IFS=':' read -r agent_name agent_role <<< "$agent"
         cat >> "$FRAMEWORK_DIR/shared/status.md" << EOF
 
-### ${agent_name^} Agent ($agent_role)
+### $(capitalize "$agent_name") Agent ($agent_role)
 - **Status**: READY - Awaiting activation and task assignment
 - **Role**: $agent_role
 - **Current Focus**: System preparation complete, ready for workflow start
@@ -561,7 +566,7 @@ EOF
     for agent in "${AGENTS[@]}"; do
         IFS=':' read -r agent_name agent_role <<< "$agent"
         cat >> "$FRAMEWORK_DIR/shared/status.md" << EOF
-- ✅ ${agent_name^} agent - $agent_role ready
+- ✅ $(capitalize "$agent_name") agent - $agent_role ready
 EOF
     done
 
@@ -660,13 +665,13 @@ EOF
     for agent1 in "${AGENTS[@]}"; do
         IFS=':' read -r agent1_name agent1_role <<< "$agent1"
         cat >> "$FRAMEWORK_DIR/shared/coordination.md" << EOF
-### ${agent1_name^} Agent Communications
+### $(capitalize "$agent1_name") Agent Communications
 EOF
         for agent2 in "${AGENTS[@]}"; do
             if [[ "$agent1" != "$agent2" ]]; then
                 IFS=':' read -r agent2_name agent2_role <<< "$agent2"
                 cat >> "$FRAMEWORK_DIR/shared/coordination.md" << EOF
-- **→ ${agent2_name^}**: [No active coordination]
+- **→ $(capitalize "$agent2_name")**: [No active coordination]
 EOF
             fi
         done
@@ -688,7 +693,7 @@ EOF
     for agent in "${AGENTS[@]}"; do
         IFS=':' read -r agent_name agent_role <<< "$agent"
         cat > "$FRAMEWORK_DIR/shared/${agent_name}-progress.md" << EOF
-# ${agent_name^} Agent Progress - $PROJECT_NAME
+# $(capitalize "$agent_name") Agent Progress - $PROJECT_NAME
 
 **Agent Role**: $agent_role  
 **Last Updated**: $(date +%Y-%m-%d)  
@@ -786,7 +791,7 @@ EOF
     for agent in "${AGENTS[@]}"; do
         IFS=':' read -r agent_name agent_role <<< "$agent"
         cat >> "$FRAMEWORK_DIR/README.md" << EOF
-│   ├── ${agent_name}-progress.md # ${agent_name^} agent progress
+│   ├── ${agent_name}-progress.md # $(capitalize "$agent_name") agent progress
 EOF
     done
 
@@ -801,7 +806,7 @@ EOF
     for agent in "${AGENTS[@]}"; do
         IFS=':' read -r agent_name agent_role <<< "$agent"
         cat >> "$FRAMEWORK_DIR/README.md" << EOF
-### ${agent_name^} Agent
+### $(capitalize "$agent_name") Agent
 - **Role**: $agent_role
 - **Definition**: \`commands/agents/${agent_name}.md\`
 - **Progress**: \`shared/${agent_name}-progress.md\`
